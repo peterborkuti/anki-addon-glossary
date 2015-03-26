@@ -1,6 +1,6 @@
 # export_html_glossary Anki add-on
 # based on export_to_html Anki add-on
-# Author Péter Borkuti
+# Author Peter Borkuti
 
 # Exports a desk to a two-column html file. The first column is the answer, the second
 # column is the question.

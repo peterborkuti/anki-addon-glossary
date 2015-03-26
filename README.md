@@ -14,5 +14,16 @@ See here: https://ankiweb.net/shared/info/156019013
 3. Open the file in a browser
 
 # Customization of the output
-create a custom.css in the directory of the htm file
+create a custom.css in the directory of the htm file.
 
+For example, if you want that the first column will be the question and the second be the answer, use this custom.css file:
+```
+.Question{
+    float: left;
+ 
+}
+.Answer{
+    float: left;
+ 
+}
+```
