@@ -4,7 +4,7 @@
 
 # Exports a desk to a two-column html file. The first column is the answer, the second
 # column is the question.
-# It is good for creating glossary based on an Anki desk
+# It is good for creating a glossary based on an Anki deck.
 
 # The output html file must be placed in the Anki's user media folder.
 # If the style must be changed, create a custom.css file in the media folder.
