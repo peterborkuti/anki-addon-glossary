@@ -101,10 +101,12 @@ img {
         
 
     def escapeText(self, text):
-        "Escape newlines, tabs and CSS."
+        "Escape newlines, tabs and CSS and change id to class"
         text = text.replace("\n", "")
         text = text.replace("\t", "")
         text = re.sub("(?i)<style>.*?</style>", "", text)
+        text = text.replace("<hr id=answer>", '<hr class="answer">')
+
         return text
  
     
@@ -113,17 +115,20 @@ img {
 
         def esc(s):
             # strip off the repeated question in answer if exists
-            s = re.sub("(?si)^.*<hr id=answer>\n*", "", s)
+            s = re.sub('(?si)^.*<hr id=answer>\n*', "", s)
             s=  re.sub("(?si)<style.*?>.*?</style>", "", s)
             return self.escapeText(s)
+
         out = ""
 
         for cid in ids:
             c = self.col.getCard(cid)
-            out += "<div class=Card>"
-            out += "  <div class=Question>" + esc(c.q()) + "</div>"
-            out += "  <div class=Answer>" + esc(c.a()) + "</div>"
-            out += "</div>" 
+
+            out += '<div class="Card">\n'
+            out += '<div class="Question">\n' + esc(c.q()) + "\n</div>\n"
+            out += '<div class="Answer">\n' + esc(c.a()) + "\n</div>\n"
+            out += "</div><!-- Card -->\n\n"
+
         out= self.htmlBefore + out + self.htmlAfter
         file.write(out.encode("utf-8"))
 
@@ -131,5 +136,5 @@ def addMyExporter(exps):
     def theid(obj):
         return ("%s (*%s)" % (obj.key, obj.ext), obj)
     exps.append(theid(MyTextCardExporter))
-    
+
 addHook("exportersList", addMyExporter)
