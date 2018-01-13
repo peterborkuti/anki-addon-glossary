@@ -36,12 +36,12 @@ class MyTextCardExporter(TextCardExporter):
 .Question{
     float: right;
     height: auto;
-    width: 40%;    
+    width: 40%;
 }
 .Answer{
     float: right;
     height: auto;
-    width: 40%;    
+    width: 40%;
 }
 
 .Answer,.Question{
@@ -70,11 +70,11 @@ class MyTextCardExporter(TextCardExporter):
 }
 
 .Card:after {
-    content: '.'; 
-    display: block; 
-    clear: both; 
-    visibility: hidden; 
-    height: 0; 
+    content: '.';
+    display: block;
+    clear: both;
+    visibility: hidden;
+    height: 0;
     line-height: 0;
 }
 img {
@@ -91,14 +91,14 @@ img {
 <link type="text/css" rel="stylesheet" href="custom.css">
 </head>
 <body>
-    """
+
+"""
     htmlAfter="""
-    </body>
+</body>
 </html>
-    """
+"""
     def __init__(self, col):
         TextCardExporter.__init__(self, col)
-        
 
     def escapeText(self, text):
         "Escape newlines, tabs and CSS and change id to class"
@@ -108,8 +108,8 @@ img {
         text = text.replace("<hr id=answer>", '<hr class="answer">')
 
         return text
- 
-    
+
+
     def doExport(self, file):
         ids = self.cardIds()
 
