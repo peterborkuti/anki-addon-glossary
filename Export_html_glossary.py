@@ -88,7 +88,7 @@ img {
 }
 
 </style>
-<link type="text/css" rel="stylesheet" href="custom.css">
+<link type="text/css" rel="stylesheet" href="custom.css"/>
 </head>
 <body>
 
