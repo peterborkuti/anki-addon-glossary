@@ -117,11 +117,19 @@ img {
             s = re.sub('(?si)^.*<hr id=answer>\n*', "", s)
             s = re.sub("(?si)<style.*?>.*?</style>", "", s)
 
-            return self.escapeText(s)
+            return convertSound(self.escapeText(randomizeId(s)))
 
         def convertSound(s):
 
             return re.sub(r'\[sound:(.*)]', r'<audio controls src="\1"></audio>', s, 0, re.IGNORECASE)
+
+        def getRandomId(group):
+            # https://pythontips.com/2013/07/28/generating-a-random-string/
+            return ' id="' + ''.join([random.choice(string.ascii_letters + string.digits) for n in xrange(32)])+'"'
+
+        def randomizeId(s):
+            return re.sub(r' +id *= *[\'"]*([^ \'">]+)[\'"]*', getRandomId, s, 0, re.IGNORECASE)
+
 
         out = ""
 
@@ -129,8 +137,8 @@ img {
             c = self.col.getCard(cid)
 
             out += '<div class="Card">\n'
-            out += '<div class="Question">\n' + convertSound(esc(c.q())) + "\n</div>\n"
-            out += '<div class="Answer">\n' + convertSound(esc(c.a())) + "\n</div>\n"
+            out += '<div class="Question">\n' + esc(c.q()) + "\n</div>\n"
+            out += '<div class="Answer">\n' + esc(c.a()) + "\n</div>\n"
             out += "</div><!-- Card -->\n\n"
 
         out= self.htmlBefore + out + self.htmlAfter
