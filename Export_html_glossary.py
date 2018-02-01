@@ -19,6 +19,8 @@ from anki.utils import  ids2str
 import re
 import sys,os
 import time
+import random
+import string
 
 class MyTextCardExporter(TextCardExporter):
 
