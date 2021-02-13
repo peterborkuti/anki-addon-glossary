@@ -15,69 +15,25 @@ from anki.exporting import TextCardExporter
 from aqt.utils import getText
 from aqt.utils import showInfo
 from anki.cards import Card
-from anki.utils import  ids2str
+from anki.utils import  ids2str, splitFields
 import re
-import sys,os
+import sys
+import os
 import time
 import random
 import string
 
-class MyTextCardExporter(TextCardExporter):
+ext = ".htm"
 
-    key = _("Export deck as Html Glossary")
-    ext = ".htm"
-    hideTags = True
-    htmlBefore="""
+hideTags = True
+
+htmlBefore="""
 <!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <title>Untitled Document</title>
 <style type="text/css">
 
-.Question{
-    float: right;
-    height: auto;
-    width: 40%;
-}
-.Answer{
-    float: right;
-    height: auto;
-    width: 40%;
-}
-
-.Answer,.Question{
-    overflow: auto;
-    padding:4px;
-    position: relative;
-    visibility: visible;
-    height: auto;
-}
-.Card {
-    min-width:25px;
-    text-align: center;
-    clear:both;
-    height: auto;
-    width: 100%;
-    overflow: visible;
-    border-top-width: thin;
-    border-right-width: thin;
-    border-bottom-width: thin;
-    border-left-width: thin;
-    border-top-style: solid;
-    border-right-style: solid;
-    border-bottom-style: solid;
-    border-left-style: solid;
-    display: block;
-}
-
-.Card:after {
-    content: '.';
-    display: block;
-    clear: both;
-    visibility: hidden;
-    height: 0;
-    line-height: 0;
-}
 img {
     max-height: 400px;
     max-width: 400px;
@@ -87,64 +43,75 @@ img {
     top:0;
     left:0;
 }
-
 </style>
-<link type="text/css" rel="stylesheet" href="custom.css"/>
 </head>
 <body>
-
 """
-    htmlAfter="""
+
+htmlAfter="""
 </body>
 </html>
 """
+
+directory = "/home/srghma/anki-addon-kanji-output"
+
+def convertSound(s):
+    return re.sub(r'\[sound:(.*)]', r'<audio controls src="\1"></audio>', s, 0, re.IGNORECASE)
+
+def getRandomId(group):
+    # https://pythontips.com/2013/07/28/generating-a-random-string/
+    return ' id="' + ''.join([random.choice(string.ascii_letters + string.digits) for n in range(32)])+'"'
+
+def escapeText(text):
+    "Escape newlines, tabs and CSS and change id to class"
+    text = text.replace("\n", "")
+    text = text.replace("\t", "")
+    text = re.sub("(?i)<style>.*?</style>", "", text)
+    text = text.replace("<hr id=answer>", '<hr class="answer">')
+
+    return text
+
+class MyTextCardExporter(TextCardExporter):
+    key = _("Export deck as My Html Glossary")
+
     def __init__(self, col):
         TextCardExporter.__init__(self, col)
 
-    def escapeText(self, text):
-        "Escape newlines, tabs and CSS and change id to class"
-        text = text.replace("\n", "")
-        text = text.replace("\t", "")
-        text = re.sub("(?i)<style>.*?</style>", "", text)
-        text = text.replace("<hr id=answer>", '<hr class="answer">')
-
-        return text
-
-
     def doExport(self, file):
-        ids = self.cardIds()
-
-        def esc(s):
+        def myEscapeText(s):
             # strip off the repeated question in answer if exists
             s = re.sub('(?si)^.*<hr id=answer>\n*', "", s)
             s = re.sub("(?si)<style.*?>.*?</style>", "", s)
+            s = re.sub('<img src="(.*?)"', r'<img src="/Internal storage/AnkiDroid/collection.media/\1"', s)
 
-            return convertSound(self.escapeText(randomizeId(s)))
+            return convertSound(escapeText(s))
 
-        def convertSound(s):
+        cardIds = self.cardIds()
 
-            return re.sub(r'\[sound:(.*)]', r'<audio controls src="\1"></audio>', s, 0, re.IGNORECASE)
+        for cardId in cardIds:
+            card = self.col.getCard(cardId)
 
-        def getRandomId(group):
-            # https://pythontips.com/2013/07/28/generating-a-random-string/
-            return ' id="' + ''.join([random.choice(string.ascii_letters + string.digits) for n in range(32)])+'"'
+            template = card.template()["name"]
 
-        def randomizeId(s):
-            return re.sub(r' +id *= *[\'"]*([^ \'">]+)[\'"]*', getRandomId, s, 0, re.IGNORECASE)
+            if template != 'from jp':
+                continue
 
+            kanji = card.note()["kanji"]
 
-        out = ""
+            print(kanji)
 
-        for cid in ids:
-            c = self.col.getCard(cid)
+            # only one
+            out = (htmlBefore +
+                "\n" + myEscapeText(card.answer()) + "\n" +
+                htmlAfter)
 
-            out += '<div class="Card">\n'
-            out += '<div class="Question">\n' + esc(c.q()) + "\n</div>\n"
-            out += '<div class="Answer">\n' + esc(c.a()) + "\n</div>\n"
-            out += "</div><!-- Card -->\n\n"
+            if not os.path.exists(directory):
+                os.makedirs(directory)
 
-        out= self.htmlBefore + out + self.htmlAfter
-        file.write(out.encode("utf-8"))
+            with open(directory + '/' + kanji + '.html', 'w') as myfile:
+                myfile.write(out)
+
+            # file.write("dummy".encode("utf-8"))
 
 def addMyExporter(exps):
     def theid(obj):
