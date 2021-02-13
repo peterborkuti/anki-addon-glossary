@@ -127,7 +127,7 @@ img {
 
         def getRandomId(group):
             # https://pythontips.com/2013/07/28/generating-a-random-string/
-            return ' id="' + ''.join([random.choice(string.ascii_letters + string.digits) for n in xrange(32)])+'"'
+            return ' id="' + ''.join([random.choice(string.ascii_letters + string.digits) for n in range(32)])+'"'
 
         def randomizeId(s):
             return re.sub(r' +id *= *[\'"]*([^ \'">]+)[\'"]*', getRandomId, s, 0, re.IGNORECASE)
