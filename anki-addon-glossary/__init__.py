@@ -27,33 +27,7 @@ ext = ".htm"
 
 hideTags = True
 
-htmlBefore="""
-<!DOCTYPE html>
-<head>
-<meta charset="UTF-8">
-<title>Untitled Document</title>
-<style type="text/css">
-
-img {
-    max-height: 400px;
-    max-width: 400px;
-    display: compact;
-    margin: 0px;
-    padding: 1px;
-    top:0;
-    left:0;
-}
-</style>
-</head>
-<body>
-"""
-
-htmlAfter="""
-</body>
-</html>
-"""
-
-directory = "/home/srghma/anki-addon-kanji-output"
+directory = "/home/srghma/Dropbox/anki-addon-kanji-output"
 
 def convertSound(s):
     return re.sub(r'\[sound:(.*)]', r'<audio controls src="\1"></audio>', s, 0, re.IGNORECASE)
@@ -66,7 +40,6 @@ def escapeText(text):
     "Escape newlines, tabs and CSS and change id to class"
     text = text.replace("\n", "")
     text = text.replace("\t", "")
-    text = re.sub("(?i)<style>.*?</style>", "", text)
     text = text.replace("<hr id=answer>", '<hr class="answer">')
 
     return text
@@ -79,10 +52,8 @@ class MyTextCardExporter(TextCardExporter):
 
     def doExport(self, file):
         def myEscapeText(s):
-            # strip off the repeated question in answer if exists
             s = re.sub('(?si)^.*<hr id=answer>\n*', "", s)
             s = re.sub("(?si)<style.*?>.*?</style>", "", s)
-            s = re.sub('<img src="(.*?)"', r'<img src="/Internal storage/AnkiDroid/collection.media/\1"', s)
 
             return convertSound(escapeText(s))
 
@@ -91,20 +62,29 @@ class MyTextCardExporter(TextCardExporter):
         for cardId in cardIds:
             card = self.col.getCard(cardId)
 
-            template = card.template()["name"]
+            template = card.template()
+            template_name = template["name"]
 
-            if template != 'from jp':
+            if template_name != 'from jp':
                 continue
 
             kanji = card.note()["kanji"]
 
-            print(kanji)
-
-            # only one
-            out = (htmlBefore +
-                "\n" + myEscapeText(card.answer()) + "\n" +
-                htmlAfter)
-
+            out = ("""\
+<!DOCTYPE html>
+<head>
+<meta charset="UTF-8">
+<title>Untitled Document</title>
+<style type="text/css">
+""" + card.css() +
+"""
+</style>
+</head>
+<body>
+""" + myEscapeText(card.answer()) + """
+</body>
+</html>
+""")
             if not os.path.exists(directory):
                 os.makedirs(directory)
 
