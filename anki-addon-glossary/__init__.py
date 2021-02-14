@@ -27,7 +27,7 @@ ext = ".htm"
 
 hideTags = True
 
-directory = "/home/srghma/Dropbox/anki-addon-kanji-output"
+directory = "/home/srghma/.local/share/Anki2/User 1/collection.media"
 
 def convertSound(s):
     return re.sub(r'\[sound:(.*)]', r'<audio controls src="\1"></audio>', s, 0, re.IGNORECASE)
@@ -75,10 +75,8 @@ class MyTextCardExporter(TextCardExporter):
 <head>
 <meta charset="UTF-8">
 <title>Untitled Document</title>
-<style type="text/css">
 """ + card.css() +
 """
-</style>
 </head>
 <body>
 """ + myEscapeText(card.answer()) + """
