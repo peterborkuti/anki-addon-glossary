@@ -28,7 +28,7 @@ ext = ".htm"
 
 hideTags = True
 
-directory = "/home/srghma/.local/share/Anki2/User 1/collection.media"
+directory = "/home/srghma/.local/share/Anki2/User 1/collection.media/anki-addon-glossary"
 
 def convertSound(s):
     return re.sub(r'\[sound:(.*)]', r'<audio controls src="\1"></audio>', s, 0, re.IGNORECASE)
@@ -76,7 +76,7 @@ class MyTextCardExporter(TextCardExporter):
 
             # card.css()
 
-            with open(directory + '/' + kanji + '.json', 'w') as myfile:
+            with open(directory + '/' + kanji + '.mynonjsonext', 'w') as myfile:
                 data = { 'answer': card.answer() }
                 json.dump(data, myfile)
 
