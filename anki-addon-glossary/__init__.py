@@ -79,7 +79,7 @@ class MyTextCardExporter(TextCardExporter):
 """ + card.css() +
 """
 </head>
-<body>
+<body class="nightMode">
 """ + myEscapeText(card.answer()) + """
 </body>
 </html>
