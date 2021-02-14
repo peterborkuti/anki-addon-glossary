@@ -22,6 +22,7 @@ import os
 import time
 import random
 import string
+import json
 
 ext = ".htm"
 
@@ -70,25 +71,14 @@ class MyTextCardExporter(TextCardExporter):
 
             kanji = card.note()["kanji"]
 
-            out = ("""\
-<!DOCTYPE html>
-<head>
-<meta charset="UTF-8">
-<title>Untitled Document</title>
-<base target="_PARENT">
-""" + card.css() +
-"""
-</head>
-<body class="nightMode">
-""" + myEscapeText(card.answer()) + """
-</body>
-</html>
-""")
             if not os.path.exists(directory):
                 os.makedirs(directory)
 
-            with open(directory + '/' + kanji + '.html', 'w') as myfile:
-                myfile.write(out)
+            # card.css()
+
+            with open(directory + '/' + kanji + '.json', 'w') as myfile:
+                data = { 'answer': card.answer() }
+                json.dump(data, myfile)
 
             # file.write("dummy".encode("utf-8"))
 
