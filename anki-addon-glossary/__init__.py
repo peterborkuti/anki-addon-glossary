@@ -75,6 +75,7 @@ class MyTextCardExporter(TextCardExporter):
 <head>
 <meta charset="UTF-8">
 <title>Untitled Document</title>
+<base target="_PARENT">
 """ + card.css() +
 """
 </head>
