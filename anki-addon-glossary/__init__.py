@@ -19,8 +19,6 @@ ext = ".htm"
 
 hideTags = True
 
-directory = "/home/srghma/anki-addon-glossary"
-
 def getRandomId(group):
     # https://pythontips.com/2013/07/28/generating-a-random-string/
     return ' id="' + ''.join([random.choice(string.ascii_letters + string.digits) for n in range(32)])+'"'
@@ -49,6 +47,8 @@ class MyTextCardExporter(TextCardExporter):
     def doExport(self, file):
         cardIds = self.cardIds()
 
+        cache = list()
+
         for cardId in cardIds:
             card = self.col.getCard(cardId)
 
@@ -63,16 +63,28 @@ class MyTextCardExporter(TextCardExporter):
             if kanji not in only_kanji:
                 continue
 
-            if not os.path.exists(directory):
-                os.makedirs(directory)
+            collection_media = '/home/srghma/.local/share/Anki2/User 1/collection.media'
+            child_dir        = 'anki-addon-glossary' # None
 
-            # card.css()
+            dir_full             = "/".join(filter(None, [collection_media, child_dir]))
+            file_from_collection = "/".join(filter(None, [child_dir, kanji + '.js']))
+            file_full            = "/".join(filter(None, [collection_media, file_from_collection]))
 
-            with open(directory + '/' + kanji + '.json', 'w') as myfile:
-                data = { 'answer': myEscapeText(card.answer()) }
-                json.dump(data, myfile)
+            if not os.path.exists(dir_full):
+                os.makedirs(dir_full)
+
+            cache.append(file_from_collection)
+
+            with open(file_full, 'w') as myfile:
+                data = { 'kanji': kanji, 'value': myEscapeText(card.answer()) }
+                data = '(window.kanjicache=window.kanjicache||[]).push(' + json.dumps(data, sort_keys=True, indent=2 * ' ', ensure_ascii=False) + ')'
+                myfile.write(data)
 
             # file.write("dummy".encode("utf-8"))
+
+        cache = map(lambda x: "<img src=\"" + x + "\">", cache)
+        cache = "".join(cache)
+        print(cache)
 
 def addMyExporter(exps):
     def theid(obj):
